@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  anomaly-app:
+    build: .
+    ports:
+      - "8001:8001"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=us-east-1
+    restart: unless-stopped

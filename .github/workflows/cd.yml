@@ -1,0 +1,35 @@
+name: CD Pipeline
+
+# Only trigger, when the build workflow succeeded i.e. CI Pipeline
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Pull Docker Image
+        env: 
+          DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+        run: sudo docker pull $DOCKER_USER/anomaly-detect:latest
+    
+      - name: Delete Old Docker Container
+        run: sudo docker rm -f anomaly-detect-container || true
+    
+      - name: Run Docker Container with AWS Secrets
+        env: 
+          DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          sudo docker run -it -d \
+            -p 8001:8001 \
+            -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
+            -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
+            -e AWS_REGION="us-east-1" \
+            --name anomaly-detect-container \
+            $DOCKER_USER/anomaly-detect:latest

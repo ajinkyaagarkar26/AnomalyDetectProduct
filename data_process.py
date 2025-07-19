@@ -7,7 +7,16 @@ import json
 import pandas as pd
 from collections import defaultdict
 from tqdm import tqdm
-from logparser import Spell, Drain
+from logparser import Drain
+from s3_utils import download_log_files_from_s3
+
+# Try to import S3 configuration, fall back to defaults if not found
+try:
+    from s3_config import ENABLE_S3_DOWNLOAD
+except ImportError:
+    print("s3_config.py not found. Using default S3 configuration.")
+    print("Copy s3_config_template.py to s3_config.py and update with your S3 details.")
+    ENABLE_S3_DOWNLOAD = False
 
 # get [log key, delta time] as input for deeplog
 input_dir  = './datasets'
@@ -21,8 +30,8 @@ log_sequence_file = output_dir + "deeplog_sequence.csv"
 def mapping():
     log_temp = pd.read_csv(log_templates_file)
     print("in mapping....")
-    print(log_temp["Occurrences"].head())
-    print(log_temp["Occurrences"].max())
+    #print(log_temp["Occurrences"].head())
+    #print(log_temp["Occurrences"].max())
     log_temp.sort_values(by = ["Occurrences"], ascending=False, inplace=True)
     print(log_temp.head())
     log_temp_dict = {event: idx+1 for idx , event in enumerate(list(log_temp["EventId"])) }
@@ -106,7 +115,7 @@ def generate_train_test(compute_instance_file, n=None, ratio=0.7):
     # print(computeInst_label_dict.head())
     seq["Label"] = seq["ComputeInstance"].apply(lambda x: computeInst_label_dict.get(x)) #add label to the sequence of each ComputeInstance
     # print("seq[Label].value_counts()")
-    print(seq['ComputeInstance'].nunique())
+    #print(seq['ComputeInstance'].nunique())
     normal_seq = seq[seq["Label"] == 0]["EventSequence"]
     normal_seq = normal_seq.sample(frac=1, random_state=20) # shuffle normal data
 
@@ -132,12 +141,50 @@ def df_to_file(df, file_name):
             f.write('\n')
 
 
-if __name__ == "__main__":
-    # 1. OS log
+def download_s3_files_if_enabled():
+    """Download files from S3 if S3 download is enabled."""
+    if ENABLE_S3_DOWNLOAD:
+        print("Downloading files from S3...")
+        download_results = download_log_files_from_s3()  # Uses configuration from s3_config.py
+        
+        # Check if all downloads were successful
+        failed_downloads = [path for path, success in download_results.items() if not success]
+        if failed_downloads:
+            print(f"Failed to download: {failed_downloads}")
+            print("Please check your S3 configuration and credentials.")
+            sys.exit(1)
+        else:
+            print("All files downloaded successfully from S3.")
+
+
+def run_data_processing_pipeline():
+    # Download files from S3 if enabled
+    print("Starting download from S3 if enabled...")
+    download_s3_files_if_enabled()   
+    """
+    Run the complete data processing pipeline including:
+    - Log parsing with Drain algorithm
+    - Event mapping and template generation
+    - DeepLog sampling
+    - Train/test data generation
+    """
+    print("Starting data processing pipeline...")
+    
+    # Set log format for OS logs
     # Below two lines are for parsing the log file. Will have to be refactored later 
     # log_format = '<Logrecord> <Date> <Time> <Pid> <Level> <Component> <ADDR> <Content>'  # OS log format
     log_format = '<Level> <Component> <ADDR> <Content>'  # OS log format
+
+    # Run the processing pipeline
     parser(input_dir, output_dir, log_file, log_format, 'drain')
     mapping()
     deeplog_sampling(log_structured_file)
     generate_train_test(log_sequence_file)
+    
+    print("Data processing pipeline completed successfully.")
+    return "Data processing pipeline completed successfully."
+
+
+if __name__ == "__main__":     
+    # Run the data processing pipeline
+    run_data_processing_pipeline()
