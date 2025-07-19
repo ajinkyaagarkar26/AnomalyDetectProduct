@@ -1,6 +1,8 @@
 # S3 Configuration File
 # Copy this file to s3_config.py and update with your actual S3 details
 
+import os
+
 # S3 Bucket Configuration
 S3_BUCKET_NAME = "anomaly-detect-1"
 
@@ -12,8 +14,8 @@ S3_LOG_FILES = [
 
 # AWS Credentials (optional - if not using AWS CLI or IAM roles)
 # Leave as None to use default credential chain
-AWS_ACCESS_KEY_ID = "AWS_KEY_ID"
-AWS_SECRET_ACCESS_KEY = "AWS_ACCESS_KEY"
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_REGION = "us-east-1"
 
 # Local directories

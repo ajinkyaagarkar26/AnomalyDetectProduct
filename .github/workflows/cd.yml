@@ -20,7 +20,16 @@ jobs:
       - name: Delete Old Docker Container
         run: sudo docker rm -f anomaly-detect-container || true
     
-      - name: Run Docker Container
+      - name: Run Docker Container with AWS Secrets
         env: 
           DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
-        run: sudo docker run -it -d -p 8000:8000 --name anomaly-detect-container $DOCKER_USER/anomaly-detect:latest
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          sudo docker run -it -d \
+            -p 8001:8001 \
+            -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
+            -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
+            -e AWS_REGION="us-east-1" \
+            --name anomaly-detect-container \
+            $DOCKER_USER/anomaly-detect:latest

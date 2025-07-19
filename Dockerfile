@@ -28,6 +28,11 @@ COPY logparser/ /app/logparser/
 COPY log_anomaly_ui/ /app/log_anomaly_ui/
 COPY deeplog.py /app/
 COPY uiUtilities.py /app/
+COPY data_process.py /app/
+COPY s3_utils.py /app/
+COPY s3_config.py /app/
+COPY data_process_train.py /app/
+COPY data_process_pred.py /app/
 
 # expose port
 EXPOSE 8001

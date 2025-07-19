@@ -141,8 +141,8 @@ def df_to_file(df, file_name):
             f.write('\n')
 
 
-if __name__ == "__main__":
-    # Download files from S3 if enabled
+def download_s3_files_if_enabled():
+    """Download files from S3 if S3 download is enabled."""
     if ENABLE_S3_DOWNLOAD:
         print("Downloading files from S3...")
         download_results = download_log_files_from_s3()  # Uses configuration from s3_config.py
@@ -155,13 +155,36 @@ if __name__ == "__main__":
             sys.exit(1)
         else:
             print("All files downloaded successfully from S3.")
+
+
+def run_data_processing_pipeline():
+    # Download files from S3 if enabled
+    print("Starting download from S3 if enabled...")
+    download_s3_files_if_enabled()   
+    """
+    Run the complete data processing pipeline including:
+    - Log parsing with Drain algorithm
+    - Event mapping and template generation
+    - DeepLog sampling
+    - Train/test data generation
+    """
+    print("Starting data processing pipeline...")
     
-    # 1. OS log
+    # Set log format for OS logs
     # Below two lines are for parsing the log file. Will have to be refactored later 
     # log_format = '<Logrecord> <Date> <Time> <Pid> <Level> <Component> <ADDR> <Content>'  # OS log format
     log_format = '<Level> <Component> <ADDR> <Content>'  # OS log format
 
+    # Run the processing pipeline
     parser(input_dir, output_dir, log_file, log_format, 'drain')
     mapping()
     deeplog_sampling(log_structured_file)
     generate_train_test(log_sequence_file)
+    
+    print("Data processing pipeline completed successfully.")
+    return "Data processing pipeline completed successfully."
+
+
+if __name__ == "__main__":     
+    # Run the data processing pipeline
+    run_data_processing_pipeline()
