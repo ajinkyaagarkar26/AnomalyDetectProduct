@@ -267,8 +267,8 @@ class Trainer():
                 output = self.model(features=features, device=self.device)
                 output = output.squeeze()
                 label = label.view(-1).to(self.device)
-                print("In valid...label...", label)
-                print("In valid...output...", output)
+                #print("In valid...label...", label)
+                #print("In valid...output...", output)
                 loss = self.criterion(output, label)
 
                 total_losses += float(loss)
