@@ -4,10 +4,13 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import shutil, os,sys
-from .config import UPLOAD_DIR, TRAIN_DIR
 # Add the root project directory to Python path
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(root_dir)
+# Add the current app directory to Python path for importing config
+app_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(app_dir)
+from config import UPLOAD_DIR, TRAIN_DIR
 # from deeplog import train
 # from data_process_pred import 
 # from models.loganomaly import train_loganomaly

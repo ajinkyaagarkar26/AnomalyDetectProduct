@@ -4,8 +4,8 @@ def ui_train(input_dir='./trainInput/', output_dir='./trainOutput/', log_file="n
 
     print("in ui_train, input_dir:",str(input_dir))
     parseResult = parser(input_dir, output_dir, log_file,log_format)
-    # print("in ui_train:",str(output_dir) + "\event_sequence.csv")
-    trainResult = generate_train_test(str(output_dir) + "\event_sequence.csv")
+    # print("in ui_train:",str(output_dir) + "/event_sequence.csv")
+    trainResult = generate_train_test(str(output_dir) + "/event_sequence.csv")
     return {parseResult, trainResult}
 
 def ui_predict():
@@ -13,6 +13,5 @@ def ui_predict():
     return
 
 
-if __name__ == "__main__":
-    # ui_train()
+if __name__ == "__main__":    
     print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
