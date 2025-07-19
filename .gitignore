@@ -1,6 +1,7 @@
 # Bytecode
 **/__pycache__/
 **/*.pyc
+**/__init__.cpython-*.pyc
 
 
 # Distribution / packaging
