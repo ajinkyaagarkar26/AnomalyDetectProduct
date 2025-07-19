@@ -43,14 +43,14 @@ def ui_deeplog_predict(pred_input_dir='./predInput/', pred_output_dir='./predOut
         print(f"Starting deeplog prediction with pred_input_dir: {pred_input_dir}")
         
         # Preprocess for prediction
-        preprocess_result = prePredict_process()
+        #preprocess_result = prePredict_process()
         
         # Run prediction parser
-        parser_result = pred_parser(pred_input_dir, pred_output_dir, log_file, log_format)
+        #parser_result = pred_parser(pred_input_dir, pred_output_dir, log_file, log_format)
         
         # Process vocab for prediction
         from deeplog import options
-        vocab_result = process_vocab(options)
+        #vocab_result = process_vocab(options)
         
         # Run prediction
         prediction_result = predict()
@@ -58,9 +58,9 @@ def ui_deeplog_predict(pred_input_dir='./predInput/', pred_output_dir='./predOut
         return {
             "status": "success", 
             "message": "Deeplog prediction completed successfully",
-            "preprocessResult": preprocess_result,
-            "parserResult": parser_result,
-            "vocabResult": vocab_result,
+            #"preprocessResult": preprocess_result,
+            #"parserResult": parser_result,
+            #"vocabResult": vocab_result,
             "predictionResult": prediction_result
         }
     except Exception as e:
