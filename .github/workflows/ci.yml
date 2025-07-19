@@ -18,13 +18,16 @@ jobs:
         python-version: '3.10'
     - name: Install dependencies
       run: pip install -r requirements/requirements.txt
-    - name: Data Process
+
+    - name: Data Process With Vocab
+      env: 
+        DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
       run: python data_process.py
-    - name: Vocab
-      run: python deeplog.py vocab
     - name: Train
       run: python deeplog.py train
-    - name: Test
+    - name: Predict
       run: python deeplog.py predict
     - uses: actions/upload-artifact@v4
       with:
