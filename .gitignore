@@ -1,7 +1,9 @@
 # Bytecode
 **/__pycache__/
 **/*.pyc
-**/__init__.cpython-*.pyc
+**/*.pyo
+**/*.pyd
+**/*$py.class
 
 
 # Distribution / packaging
