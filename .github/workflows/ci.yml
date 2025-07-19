@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  train-test:
+  train-test-push-image:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -29,11 +29,23 @@ jobs:
       run: python deeplog.py train
     - name: Predict
       run: python deeplog.py predict
-    - uses: actions/upload-artifact@v4
-      with:
-        name: trained-pipeline
-        path: output/
-        retention-days: 1
+    - name: Login to Docker hub
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASS_TOKEN }}
+      run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
+
+    - name: Build the Docker image for Fastapi app
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+      run: docker build . -f Dockerfile -t $DOCKER_USER/anomaly-detect:latest
+
+    - name: Push the Docker Image
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+      run: docker push $DOCKER_USER/anomaly-detect
+    - name: Logout to Docker hub
+      run: docker logout
 
   # build:
   #   needs: train-test
@@ -60,33 +72,33 @@ jobs:
   #       path: dist/*.whl
   #       retention-days: 1
 
-  push-image:
-    needs: [train-test]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Repo Checkout
-      uses: actions/checkout@v2
+  # push-image:
+  #   needs: [train-test]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Repo Checkout
+  #     uses: actions/checkout@v2
 
-    - uses: actions/download-artifact@v4
-      with:
-        name: my-build-package
-        path: anomaly-detect-app
+  #   - uses: actions/download-artifact@v4
+  #     with:
+  #       name: my-build-package
+  #       path: anomaly-detect-app
 
-    - name: Login to Docker hub
-      env:
-        DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASS_TOKEN }}
-      run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
+  #   - name: Login to Docker hub
+  #     env:
+  #       DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+  #       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASS_TOKEN }}
+  #     run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
 
-    - name: Build the Docker image for Fastapi app
-      env:
-        DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
-      run: docker build . -f Dockerfile -t $DOCKER_USER/anomaly-detect:latest
+  #   - name: Build the Docker image for Fastapi app
+  #     env:
+  #       DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+  #     run: docker build . -f Dockerfile -t $DOCKER_USER/anomaly-detect:latest
 
-    - name: Push the Docker Image
-      env:
-        DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
-      run: docker push $DOCKER_USER/anomaly-detect
+  #   - name: Push the Docker Image
+  #     env:
+  #       DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+  #     run: docker push $DOCKER_USER/anomaly-detect
 
-    - name: Logout to Docker hub
-      run: docker logout
+  #   - name: Logout to Docker hub
+  #     run: docker logout
