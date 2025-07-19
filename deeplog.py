@@ -122,6 +122,7 @@ def process_vocab(options):
     options['num_classes'] = options["vocab_size"]
     print("Vocab saved at", options["vocab_path"])
     print("saved vocab_size", options["vocab_size"])
+    return len(vocab)
     
 
 if __name__ == "__main__":
@@ -135,6 +136,7 @@ if __name__ == "__main__":
     predict_parser.set_defaults(mode='predict')
     predict_parser.add_argument('--mean', type=float, default=0, help='error gaussian distribution mean')
     predict_parser.add_argument('--std', type=float, default=0, help='error gaussian distribution std')
+    predict_parser.add_argument('--vocab_size', type=int, help='vocabulary size for the model')
 
     vocab_parser = subparsers.add_parser('vocab')
     vocab_parser.set_defaults(mode='vocab')
@@ -143,12 +145,14 @@ if __name__ == "__main__":
     print("arguments", args)
 
     if args.mode == 'train':
-        #process_vocab(options)
+        process_vocab(options)
         train()
 
-    elif args.mode == 'predict':        
+    elif args.mode == 'predict':
         anomalyCS = predict()
         print("anomalyCS", anomalyCS)
 
     elif args.mode == 'vocab':
-        process_vocab(options)
+        vocab_size = process_vocab(options)
+        print(f"Vocab size: {vocab_size}")
+        sys.exit(vocab_size)
