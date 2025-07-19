@@ -12,8 +12,8 @@ from logdeep.dataset.vocab import Vocab
 
 import torch
 
-data_dir = os.path.expanduser("./trainInput")
-output_dir = "./trainOutput/"
+data_dir = os.path.expanduser("./datasets")
+output_dir = "./output/deeplog/"
 
 # Config Parameters
 options = dict()
@@ -51,7 +51,7 @@ options['num_layers'] = 2
 options["embedding_dim"] = 50
 # options["vocab_size"] = 17
 # options["vocab_size"] = 24
-options["vocab_size"] = 23
+options["vocab_size"] = 24
 options['num_classes'] = options["vocab_size"]
 
 
@@ -118,6 +118,11 @@ def process_vocab(options):
     vocab = Vocab(logs)
     print("vocab_size", len(vocab))
     vocab.save_vocab(options["vocab_path"])
+    options["vocab_size"] = len(vocab)
+    options['num_classes'] = options["vocab_size"]
+    print("Vocab saved at", options["vocab_path"])
+    print("saved vocab_size", options["vocab_size"])
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -138,10 +143,10 @@ if __name__ == "__main__":
     print("arguments", args)
 
     if args.mode == 'train':
+        #process_vocab(options)
         train()
 
-    elif args.mode == 'predict':
-        process_vocab(options)
+    elif args.mode == 'predict':        
         anomalyCS = predict()
         print("anomalyCS", anomalyCS)
 
