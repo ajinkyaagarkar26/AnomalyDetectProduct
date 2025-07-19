@@ -53,3 +53,7 @@ virtualenv/
 
 # Project Files
 output/*
+trainOutput/*
+
+# Ignore datasets
+datasets/*

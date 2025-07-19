@@ -112,6 +112,13 @@ def vocab():
 
     
 
+def process_vocab(options):
+    with open(options["train_vocab"], 'r') as f:
+        logs = f.readlines()
+    vocab = Vocab(logs)
+    print("vocab_size", len(vocab))
+    vocab.save_vocab(options["vocab_path"])
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
@@ -134,12 +141,9 @@ if __name__ == "__main__":
         train()
 
     elif args.mode == 'predict':
+        process_vocab(options)
         anomalyCS = predict()
         print("anomalyCS", anomalyCS)
 
     elif args.mode == 'vocab':
-        with open(options["train_vocab"], 'r') as f:
-            logs = f.readlines()
-        vocab = Vocab(logs)
-        print("vocab_size", len(vocab))
-        vocab.save_vocab(options["vocab_path"])
+        process_vocab(options)

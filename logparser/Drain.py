@@ -405,8 +405,8 @@ class LogParser:
                 # tracer.save("trace.json")
 
                 count += 1
-                if count % 1000 == 0 or count == len(self.df_log):
-                    print('Processed {0:.1f}% of log lines.'.format(count * 100.0 / len(self.df_log)), end='\r')
+                # if count % 1000 == 0 or count == len(self.df_log):
+                #     print('Processed {0:.1f}% of log lines.'.format(count * 100.0 / len(self.df_log)), end='\r')
 
         if not os.path.exists(self.savePath):
             os.makedirs(self.savePath)
@@ -455,8 +455,8 @@ class LogParser:
                 # tracer.save("trace.json")
 
                 count += 1
-                if count % 1000 == 0 or count == len(self.df_log):
-                    print('Processed {0:.1f}% of log lines.'.format(count * 100.0 / len(self.df_log)), end='\r')
+                #if count % 1000 == 0 or count == len(self.df_log):
+                    #print('Processed {0:.1f}% of log lines.'.format(count * 100.0 / len(self.df_log)), end='\r')
 
         if not os.path.exists(self.savePath):
             os.makedirs(self.savePath)
@@ -539,7 +539,7 @@ class LogParser:
         regex = ''
         for k in range(len(splitters)):
             if k % 2 == 0:
-                splitter = re.sub(r' +', '\\\s+', splitters[k])
+                splitter = re.sub(r' +', r'\\s+', splitters[k])
                 regex += splitter
             else:
                 header = splitters[k].strip('<').strip('>')
@@ -553,7 +553,7 @@ class LogParser:
         if "<*>" not in template_regex: return []
         template_regex = re.sub(r'([^A-Za-z0-9])', r'\\\1', template_regex)
         template_regex = re.sub(r' +', r'\\s+', template_regex)
-        template_regex = "r^" + template_regex.replace("\<\*\>", "(.*?)") + "$"
+        template_regex = "^" + template_regex.replace("\\<\\*\\>", "(.*?)") + "$"
         parameter_list = re.findall(template_regex, row["Content"])
         parameter_list = parameter_list[0] if parameter_list else ()
         parameter_list = list(parameter_list) if isinstance(parameter_list, tuple) else [parameter_list]
