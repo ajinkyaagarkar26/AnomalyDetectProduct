@@ -33,6 +33,7 @@ COPY s3_utils.py /app/
 COPY s3_config.py /app/
 COPY data_process_train.py /app/
 COPY data_process_pred.py /app/
+COPY output/ /app/output/
 
 # expose port
 EXPOSE 8001
