@@ -25,18 +25,17 @@ WORKDIR /app
 # Copy project files
 COPY logdeep/ /app/logdeep/
 COPY logparser/ /app/logparser/
-COPY log_anomaly_ui/ /app/log_anomaly_ui/
+COPY log_anomaly/ /app/log_anomaly/
 COPY deeplog.py /app/
-COPY uiUtilities.py /app/
 COPY data_process.py /app/
-COPY s3_utils.py /app/
-COPY s3_config.py /app/
-COPY data_process_train.py /app/
-COPY data_process_pred.py /app/
-COPY output/ /app/output/
+COPY configs/ /app/configs/
+COPY utils/ /app/utils/
+COPY model/deeplog/bestloss.pth /app/model/deeplog/bestloss.pth
+COPY model/deeplog/scale.pkl /app/model/deeplog/scale.pkl
+COPY model/vocab.pkl /app/model/vocab.pkl
 
 # expose port
 EXPOSE 8001
 
 # run app
-CMD ["uvicorn", "log_anomaly_ui.app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "log_anomaly.app.main:app", "--host", "0.0.0.0", "--port", "8001"]
