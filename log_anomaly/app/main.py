@@ -11,7 +11,18 @@ app_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(app_dir)
 from config import UPLOAD_DIR, TRAIN_DIR
 from log_anomaly.app.log_anomaly_service import predict_sequence
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Your list of allowed origins
+    allow_credentials=True,  # Allow cookies and authorization headers
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 # Pydantic models for request/response
 class SequencePredictionRequest(BaseModel):
