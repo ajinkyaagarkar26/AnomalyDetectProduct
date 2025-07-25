@@ -9,10 +9,8 @@ sys.path.append(root_dir)
 # Add the current app directory to Python path for importing config
 app_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(app_dir)
-from config import UPLOAD_DIR, TRAIN_DIR
-from log_anomaly.app.log_anomaly_service import predict_sequence
 from fastapi.middleware.cors import CORSMiddleware
-
+from log_anomaly_service import predict_sequence
 app = FastAPI()
 
 
