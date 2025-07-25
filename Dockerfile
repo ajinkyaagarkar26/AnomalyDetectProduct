@@ -25,7 +25,7 @@ WORKDIR /app
 # Copy project files
 COPY logdeep/ /app/logdeep/
 COPY logparser/ /app/logparser/
-COPY log_anomaly/ /app/log_anomaly/
+COPY log_anomaly-app/ /app/log_anomaly-app/
 COPY deeplog.py /app/
 COPY data_process.py /app/
 COPY configs/ /app/configs/
@@ -38,4 +38,4 @@ COPY model/vocab.pkl /app/model/vocab.pkl
 EXPOSE 8001
 
 # run app
-CMD ["uvicorn", "log_anomaly.app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "log_anomaly-app.main:app", "--host", "0.0.0.0", "--port", "8001"]

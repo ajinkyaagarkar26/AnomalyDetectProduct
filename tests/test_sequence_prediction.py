@@ -68,7 +68,7 @@ def test_sequence_prediction():
             }
         },
         {
-            "name": "Instance termination sequence",
+            "name": "Instance termination sequence - Non Anomaly",
             "data": {
                 "event_sequence": [
                     "INFO nova.compute.manager [req-979f4d38-e788-4abf-ab98-5d63ce15f517] [instance: 11760334-ac63-4cc8-9086-578422af8c99] Terminating instance",
@@ -98,7 +98,7 @@ def test_sequence_prediction():
             }
         },
         {
-            "name": "Libvirt domain error sequence",
+            "name": "Libvirt domain error sequence - Non Anomaly",
             "data": {
                 "event_sequence": [
                     "INFO nova.compute.manager [req-2d399014-32df-490c-97a4-646ba82df5cf] [instance: f52f599a-b2a2-478c-bcfe-9933528dd526] Terminating instance",

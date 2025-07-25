@@ -1,8 +1,10 @@
 import os
+import sys
+
+# Add the parent directory to Python path so we can import logparser
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Add imports for data processing and prediction
-from data_process import run_data_processing_pipeline
-from deeplog import predict
 from logparser import Drain
 
 
