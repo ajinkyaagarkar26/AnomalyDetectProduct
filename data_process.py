@@ -8,11 +8,11 @@ import pandas as pd
 from collections import defaultdict
 from tqdm import tqdm
 from logparser import Drain
-from s3_utils import download_log_files_from_s3
+from utils.s3_utils import download_log_files_from_s3
 
 # Try to import S3 configuration, fall back to defaults if not found
 try:
-    from s3_config import ENABLE_S3_DOWNLOAD
+    from configs.s3_config import ENABLE_S3_DOWNLOAD
 except ImportError:
     print("s3_config.py not found. Using default S3 configuration.")
     print("Copy s3_config_template.py to s3_config.py and update with your S3 details.")
@@ -23,7 +23,6 @@ input_dir  = './datasets'
 output_dir = './output/deeplog/'  # The output directory of parsing results
 log_file   = "nova-sample.log"
 log_structured_file = output_dir + log_file + "_structured.csv"
-# log_structured_file = output_dir + "common2_structured.csv"
 log_templates_file = output_dir + log_file + "_templates.csv"
 log_sequence_file = output_dir + "deeplog_sequence.csv"
 

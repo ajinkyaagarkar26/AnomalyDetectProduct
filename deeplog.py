@@ -11,15 +11,18 @@ from logdeep.tools.utils import *
 from logdeep.dataset.vocab import Vocab
 
 import torch
+import os
 
-data_dir = os.path.expanduser("./trainInput")
-output_dir = "./trainOutput/"
-
+data_dir = os.path.expanduser("./datasets")
+model_output_dir = "./model/"
+output_dir = "./output/deeplog/"
 # Config Parameters
 options = dict()
+options["model_output_dir"] = model_output_dir
 options["output_dir"] = output_dir
 options["train_vocab"] = output_dir + "train"
 options["vocab_path"] = output_dir + "vocab.pkl"
+options["model_vocab_path"] = model_output_dir + "vocab.pkl"
 
 options['device'] = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -51,7 +54,7 @@ options['num_layers'] = 2
 options["embedding_dim"] = 50
 # options["vocab_size"] = 17
 # options["vocab_size"] = 24
-options["vocab_size"] = 23
+options["vocab_size"] = 24
 options['num_classes'] = options["vocab_size"]
 
 
@@ -69,7 +72,7 @@ options['lr_decay_ratio'] = 0.1
 
 options['resume_path'] = None
 options['model_name'] = "deeplog"
-options['save_dir'] = options["output_dir"] + "deeplog/"
+options['save_dir'] = options["model_output_dir"] + "deeplog/"
 
 # Predict
 options['model_path'] = options["save_dir"] + "bestloss.pth"
@@ -118,6 +121,13 @@ def process_vocab(options):
     vocab = Vocab(logs)
     print("vocab_size", len(vocab))
     vocab.save_vocab(options["vocab_path"])
+    vocab.save_vocab(options["model_vocab_path"])
+    options["vocab_size"] = len(vocab)
+    options['num_classes'] = options["vocab_size"]
+    print("Vocab saved at", options["vocab_path"])
+    print("saved vocab_size", options["vocab_size"])
+    return len(vocab)
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -130,6 +140,7 @@ if __name__ == "__main__":
     predict_parser.set_defaults(mode='predict')
     predict_parser.add_argument('--mean', type=float, default=0, help='error gaussian distribution mean')
     predict_parser.add_argument('--std', type=float, default=0, help='error gaussian distribution std')
+    predict_parser.add_argument('--vocab_size', type=int, help='vocabulary size for the model')
 
     vocab_parser = subparsers.add_parser('vocab')
     vocab_parser.set_defaults(mode='vocab')
@@ -138,12 +149,15 @@ if __name__ == "__main__":
     print("arguments", args)
 
     if args.mode == 'train':
+        os.makedirs(options["model_output_dir"], exist_ok=True)
+        process_vocab(options)
         train()
 
     elif args.mode == 'predict':
-        process_vocab(options)
         anomalyCS = predict()
         print("anomalyCS", anomalyCS)
 
     elif args.mode == 'vocab':
-        process_vocab(options)
+        vocab_size = process_vocab(options)
+        print(f"Vocab size: {vocab_size}")
+        sys.exit(vocab_size)

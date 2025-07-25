@@ -2,11 +2,11 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - main
+      - '**'
   workflow_dispatch:
 
 jobs:
-  train-test:
+  train-test-push-image:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -18,57 +18,17 @@ jobs:
         python-version: '3.10'
     - name: Install dependencies
       run: pip install -r requirements/requirements.txt
-    - name: Data Process
+
+    - name: Data Process With Vocab
+      env: 
+        DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
       run: python data_process.py
-    - name: Vocab
-      run: python deeplog.py vocab
     - name: Train
       run: python deeplog.py train
-    - name: Test
+    - name: Predict
       run: python deeplog.py predict
-    - uses: actions/upload-artifact@v4
-      with:
-        name: trained-pipeline
-        path: output/
-        retention-days: 1
-
-  build:
-    needs: train-test
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.10'
-    - uses: actions/download-artifact@v4
-      with:
-        name: trained-pipeline
-        path: output/
-    - name: Install dependencies
-      run: pip install --upgrade build
-    - name: Build package
-      run: python -m build
-    - uses: actions/upload-artifact@v4
-      with:
-        name: my-build-package
-        path: dist/*.whl
-        retention-days: 1
-
-  push-image:
-    needs: [train-test, build]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Repo Checkout
-      uses: actions/checkout@v2
-
-    - uses: actions/download-artifact@v4
-      with:
-        name: my-build-package
-        path: anomaly-detect-app
-
     - name: Login to Docker hub
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
@@ -84,6 +44,61 @@ jobs:
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
       run: docker push $DOCKER_USER/anomaly-detect
-
     - name: Logout to Docker hub
       run: docker logout
+
+  # build:
+  #   needs: train-test
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - name: Set up Python 3.10
+  #     uses: actions/setup-python@v3
+  #     with:
+  #       python-version: '3.10'
+  #   - uses: actions/download-artifact@v4
+  #     with:
+  #       name: trained-pipeline
+  #       path: output/
+  #   - name: Install dependencies
+  #     run: pip install --upgrade build
+  #   - name: Build package
+  #     run: python -m build
+  #   - uses: actions/upload-artifact@v4
+  #     with:
+  #       name: my-build-package
+  #       path: dist/*.whl
+  #       retention-days: 1
+
+  # push-image:
+  #   needs: [train-test]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Repo Checkout
+  #     uses: actions/checkout@v2
+
+  #   - uses: actions/download-artifact@v4
+  #     with:
+  #       name: my-build-package
+  #       path: anomaly-detect-app
+
+  #   - name: Login to Docker hub
+  #     env:
+  #       DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+  #       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASS_TOKEN }}
+  #     run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
+
+  #   - name: Build the Docker image for Fastapi app
+  #     env:
+  #       DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+  #     run: docker build . -f Dockerfile -t $DOCKER_USER/anomaly-detect:latest
+
+  #   - name: Push the Docker Image
+  #     env:
+  #       DOCKER_USER: ${{ secrets.DOCKER_USER_NAME }}
+  #     run: docker push $DOCKER_USER/anomaly-detect
+
+  #   - name: Logout to Docker hub
+  #     run: docker logout
